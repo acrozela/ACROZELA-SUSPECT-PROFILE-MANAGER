@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACROZELA Suspect Profile Manager - Professional Investigation Tool for managing person profiles, associations, and notes.">
+    <meta name="author" content="ACROZELA TECH">
+    <title>ACROZELA SUSPECT PROFILE MANAGER TOOL</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: var(--surface);
+            padding: 1rem 5%;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar Navigation */
+        nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 1rem;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            color: var(--text-muted);
+            transition: 0.3s;
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-btn:hover:not(.active) {
+            background: #e2e8f0;
+        }
+
+        /* Main Content */
+        main {
+            background: transparent;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard/Cards */
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 { font-size: 1.5rem; color: var(--text-main); }
+
+        /* Forms */
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        /* Profile List Styling */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .profile-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .currency-text {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        /* Associations & Notes */
+        .note-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+            font-weight: 700;
+            color: var(--secondary);
+            letter-spacing: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            nav {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+            .nav-btn {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">ACROZELA SUSPECT PROFILE MANAGER TOOL</div>
+    <div id="date-display" style="font-size: 0.8rem; font-weight: 600;"></div>
+</header>
+
+<div class="container">
+    <nav>
+        <button class="nav-btn active" onclick="switchTab('dashboard')"><i class="fas fa-chart-line"></i> DASHBOARD</button>
+        <button class="nav-btn" onclick="switchTab('profiles')"><i class="fas fa-users"></i> PERSON PROFILES</button>
+        <button class="nav-btn" onclick="switchTab('associations')"><i class="fas fa-project-diagram"></i> ASSOCIATIONS</button>
+        <button class="nav-btn" onclick="switchTab('notes')"><i class="fas fa-sticky-note"></i> CASE NOTES</button>
+    </nav>
+
+    <main>
+        <!-- Dashboard Section (Empty Initially) -->
+        <section id="dashboard" class="view-section active">
+            <div class="card">
+                <h2>OVERVIEW</h2>
+                <div id="stats-container" class="profile-grid" style="margin-top: 1rem;">
+                    <!-- Stats will be injected here -->
+                </div>
+            </div>
+            <div id="recent-activity" class="card">
+                <h2>SYSTEM STATUS</h2>
+                <p style="color: var(--text-muted); margin-top: 1rem;">Database is live. All data is stored locally in Indian Currency (₹).</p>
+            </div>
+        </section>
+
+        <!-- Profiles Section -->
+        <section id="profiles" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2>PERSON PROFILES</h2>
+                    <button class="btn btn-primary" onclick="openModal('profileModal')"><i class="fas fa-plus"></i> ADD PROFILE</button>
+                </div>
+                <div id="profiles-list" class="profile-grid">
+                    <!-- Profiles dynamic -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Associations Section -->
+        <section id="associations" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2>ASSOCIATIONS</h2>
+                    <button class="btn btn-primary" onclick="openModal('assocModal')"><i class="fas fa-link"></i> ADD LINK</button>
+                </div>
+                <div id="associations-list">
+                    <!-- Associations dynamic -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Notes Section -->
+        <section id="notes" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2>CASE NOTES</h2>
+                    <button class="btn btn-primary" onclick="openModal('noteModal')"><i class="fas fa-pen"></i> NEW NOTE</button>
+                </div>
+                <div id="notes-list">
+                    <!-- Notes dynamic -->
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Modals -->
+<div id="profileModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; padding: 2rem;">
+    <div class="card" style="max-width: 500px; margin: auto;">
+        <h3>Add New Profile</h3><br>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="p-name" placeholder="John Doe">
+        </div>
+        <div class="form-group">
+            <label>Alias / Known As</label>
+            <input type="text" id="p-alias" placeholder="The Ghost">
+        </div>
+        <div class="form-group">
+            <label>Estimated Assets (INR)</label>
+            <input type="number" id="p-assets" placeholder="₹ 0.00">
+        </div>
+        <div style="display:flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="saveProfile()">SAVE</button>
+            <button class="btn" onclick="closeModal('profileModal')">CANCEL</button>
+        </div>
+    </div>
+</div>
+
+<div id="assocModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; padding: 2rem;">
+    <div class="card" style="max-width: 500px; margin: auto;">
+        <h3>Link Suspects</h3><br>
+        <div class="form-group">
+            <label>Suspect A</label>
+            <select id="assoc-a"></select>
+        </div>
+        <div class="form-group">
+            <label>Relationship Type</label>
+            <input type="text" id="assoc-rel" placeholder="e.g. Business Partner, Cousin">
+        </div>
+        <div class="form-group">
+            <label>Suspect B</label>
+            <select id="assoc-b"></select>
+        </div>
+        <div style="display:flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="saveAssociation()">LINK</button>
+            <button class="btn" onclick="closeModal('assocModal')">CANCEL</button>
+        </div>
+    </div>
+</div>
+
+<div id="noteModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; padding: 2rem;">
+    <div class="card" style="max-width: 500px; margin: auto;">
+        <h3>Case Note</h3><br>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="n-title" placeholder="Observation Title">
+        </div>
+        <div class="form-group">
+            <label>Details</label>
+            <textarea id="n-body" rows="4"></textarea>
+        </div>
+        <div style="display:flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="saveNote()">SAVE NOTE</button>
+            <button class="btn" onclick="closeModal('noteModal')">CANCEL</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    FOOTER TITLE AND DEVELOPED BY ACROZELA TECH FULLY CAPITAL MENTION
+</footer>
+
+<script>
+    // State Management
+    let state = {
+        profiles: JSON.parse(localStorage.getItem('az_profiles')) || [],
+        associations: JSON.parse(localStorage.getItem('az_associations')) || [],
+        notes: JSON.parse(localStorage.getItem('az_notes')) || []
+    };
+
+    function saveData() {
+        localStorage.setItem('az_profiles', JSON.stringify(state.profiles));
+        localStorage.setItem('az_associations', JSON.stringify(state.associations));
+        localStorage.setItem('az_notes', JSON.stringify(state.notes));
+        renderAll();
+    }
+
+    // UI Navigation
+    function switchTab(tabId) {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        if(tabId === 'associations') updateDropdowns();
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // CRUD Functions
+    function saveProfile() {
+        const name = document.getElementById('p-name').value;
+        const alias = document.getElementById('p-alias').value;
+        const assets = document.getElementById('p-assets').value;
+
+        if(!name) return alert("Name is required");
+
+        state.profiles.push({
+            id: Date.now(),
+            name,
+            alias,
+            assets: assets || 0
+        });
+
+        saveData();
+        closeModal('profileModal');
+        document.getElementById('p-name').value = '';
+        document.getElementById('p-alias').value = '';
+        document.getElementById('p-assets').value = '';
+    }
+
+    function deleteProfile(id) {
+        state.profiles = state.profiles.filter(p => p.id !== id);
+        // Also clean up associations involving this profile
+        state.associations = state.associations.filter(a => a.aId !== id && a.bId !== id);
+        saveData();
+    }
+
+    function saveAssociation() {
+        const aId = parseInt(document.getElementById('assoc-a').value);
+        const bId = parseInt(document.getElementById('assoc-b').value);
+        const rel = document.getElementById('assoc-rel').value;
+
+        if(!aId || !bId || aId === bId) return alert("Select two different suspects");
+
+        state.associations.push({ id: Date.now(), aId, bId, rel });
+        saveData();
+        closeModal('assocModal');
+    }
+
+    function deleteAssociation(id) {
+        state.associations = state.associations.filter(a => a.id !== id);
+        saveData();
+    }
+
+    function saveNote() {
+        const title = document.getElementById('n-title').value;
+        const body = document.getElementById('n-body').value;
+        if(!title) return alert("Title required");
+
+        state.notes.push({
+            id: Date.now(),
+            title,
+            body,
+            date: new Date().toLocaleString('en-IN')
+        });
+
+        saveData();
+        closeModal('noteModal');
+        document.getElementById('n-title').value = '';
+        document.getElementById('n-body').value = '';
+    }
+
+    function deleteNote(id) {
+        state.notes = state.notes.filter(n => n.id !== id);
+        saveData();
+    }
+
+    // Rendering Logic
+    function renderAll() {
+        renderDashboard();
+        renderProfiles();
+        renderAssociations();
+        renderNotes();
+    }
+
+    function renderDashboard() {
+        const container = document.getElementById('stats-container');
+        container.innerHTML = `
+            <div class="profile-item" style="border-color: var(--primary)">
+                <h4>Total Profiles</h4>
+                <p style="font-size: 2rem; font-weight: bold;">${state.profiles.length}</p>
+            </div>
+            <div class="profile-item" style="border-color: var(--success)">
+                <h4>Tracked Assets</h4>
+                <p class="currency-text" style="font-size: 1.5rem;">₹ ${state.profiles.reduce((acc, p) => acc + parseFloat(p.assets), 0).toLocaleString('en-IN')}</p>
+            </div>
+            <div class="profile-item" style="border-color: var(--secondary)">
+                <h4>Associations</h4>
+                <p style="font-size: 1.5rem; font-weight: bold;">${state.associations.length}</p>
+            </div>
+        `;
+    }
+
+    function renderProfiles() {
+        const list = document.getElementById('profiles-list');
+        if(state.profiles.length === 0) {
+            list.innerHTML = `<div class="empty-state">No profiles found. Database empty.</div>`;
+            return;
+        }
+        list.innerHTML = state.profiles.map(p => `
+            <div class="profile-item">
+                <button onclick="deleteProfile(${p.id})" style="position:absolute; right:10px; top:10px; border:none; background:none; cursor:pointer; color:var(--danger)"><i class="fas fa-trash"></i></button>
+                <div style="font-weight: 700; font-size: 1.1rem;">${p.name.toUpperCase()}</div>
+                <div style="color: var(--secondary); font-size: 0.8rem; margin-bottom: 0.5rem;">Alias: ${p.alias || 'N/A'}</div>
+                <div class="currency-text">Net Worth: ₹ ${parseFloat(p.assets).toLocaleString('en-IN')}</div>
+            </div>
+        `).join('');
+    }
+
+    function updateDropdowns() {
+        const a = document.getElementById('assoc-a');
+        const b = document.getElementById('assoc-b');
+        const options = state.profiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        a.innerHTML = `<option value="">Select Suspect...</option>` + options;
+        b.innerHTML = `<option value="">Select Suspect...</option>` + options;
+    }
+
+    function renderAssociations() {
+        const list = document.getElementById('associations-list');
+        if(state.associations.length === 0) {
+            list.innerHTML = `<div class="empty-state">No active associations recorded.</div>`;
+            return;
+        }
+        list.innerHTML = state.associations.map(a => {
+            const p1 = state.profiles.find(p => p.id === a.aId)?.name || 'Unknown';
+            const p2 = state.profiles.find(p => p.id === a.bId)?.name || 'Unknown';
+            return `
+                <div class="note-item" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong>${p1}</strong> <span style="color:var(--primary)"> ← ${a.rel} → </span> <strong>${p2}</strong>
+                    </div>
+                    <button class="btn btn-danger" style="padding: 0.4rem 0.8rem;" onclick="deleteAssociation(${a.id})"><i class="fas fa-times"></i></button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderNotes() {
+        const list = document.getElementById('notes-list');
+        if(state.notes.length === 0) {
+            list.innerHTML = `<div class="empty-state">No case notes found.</div>`;
+            return;
+        }
+        list.innerHTML = state.notes.map(n => `
+            <div class="note-item">
+                 <button onclick="deleteNote(${n.id})" style="position:absolute; right:10px; top:10px; border:none; background:none; cursor:pointer; color:var(--danger)"><i class="fas fa-trash"></i></button>
+                <h4 style="margin-bottom: 0.2rem;">${n.title}</h4>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">${n.body}</p>
+                <small style="color: var(--secondary)">${n.date}</small>
+            </div>
+        `).join('');
+    }
+
+    // Initialize
+    window.onload = () => {
+        renderAll();
+        document.getElementById('date-display').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+    };
+</script>
+
+</body>
+</html>
